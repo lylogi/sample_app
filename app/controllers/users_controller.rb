@@ -11,6 +11,7 @@ class UsersController < ApplicationController
   def show
     redirect_to root_url and return unless @user.activated?
     @microposts = @user.microposts.paginate page: params[:page]
+    @active = current_user.active_relationships.find_by followed_id: @user.id
   end
 
   def new
@@ -44,6 +45,20 @@ class UsersController < ApplicationController
     @user.destroy
     flash[:success] = "User deleted"
     redirect_to root_url
+  end
+
+  def following
+    @title = "Following"
+    @user  = User.find_by id: params[:id]
+    @users = @user.following.paginate page: params[:page]
+    render "show_follow"
+  end
+
+  def followers
+    @title = "Followers"
+    @user  = User.find_by id: params[:id]
+    @users = @user.followers.paginate page: params[:page]
+    render "show_follow"
   end
 
   private 
